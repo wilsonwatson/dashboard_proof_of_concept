@@ -1,20 +1,47 @@
-use std::cell::RefCell;
-
-use egui::{Ui, plot::{Plot, Legend, PlotPoint, Line, PlotPoints}, Color32};
-
+use egui::{Ui, plot::{Plot, Legend, Line, PlotPoints}, Color32};
 
 pub struct PlotSettings {
-    
+    // TODO
 }
 
 pub struct NumberViewSettings {
-    
+    // TODO
 }
 
+pub struct ConditionalSettings {
+    // TODO
+}
+
+pub struct StringSettings {
+    // TODO
+}
+
+pub struct SelectableChooserSettings {
+    // TODO
+}
+
+pub struct Field2dSettings {
+    // TODO
+}
+
+pub struct CameraStreamSettings {
+    // TODO
+}
+
+pub struct RVizSettings {
+    // TODO
+}
+
+// TODO serde using https://serde.rs/enum-representations.html#internally-tagged
 pub enum View {
     Plot{name: String, settings: PlotSettings},
     Number{name: String, settings: NumberViewSettings},
-    BoolView{name: String, true_case: Box<View>, false_case: Box<View>},
+    Conditional{true_case: Vec<View>, false_case: Vec<View>, settings: ConditionalSettings},
+    String{name: String, settings: StringSettings},
+    SelectableChooser{name: String, settings: SelectableChooserSettings},
+    Field2dSettings{settings: Field2dSettings},
+    CameraStream{settings: CameraStreamSettings},
+    RViz{settings: RVizSettings},
     /*
      * TODO: 
      * - Selectable Chooser
@@ -29,7 +56,8 @@ impl View {
             View::Plot { name, settings } => {
                 ui.vertical(|ui| {
                     ui.label(name);
-                    let mut plot = Plot::new("demo_plot").legend(Legend::default());
+                    // TODO use actual values
+                    let plot = Plot::new("demo_plot").legend(Legend::default());
                     plot.width(256.0).height(256.0).show(ui, |plot_ui| {
                         plot_ui.line(
                             Line::new(PlotPoints::from_explicit_callback(|x| x.sin(), .., 512)).color(Color32::from_rgb(200, 100, 100)).name(name)
@@ -38,6 +66,7 @@ impl View {
                 });
             },
             View::Number { name, settings } => {
+                // TODO use actual values
                 let mut val = format!("{}", 20);
                 ui.horizontal(|ui| {
                     ui.label(name);
@@ -46,16 +75,17 @@ impl View {
                     }
                 });
             },
-            View::BoolView { name, true_case, false_case } => {
+            View::Conditional { settings, true_case, false_case } => {
                 ui.horizontal(|ui| {
-                    ui.label(name);
+                    // TODO use actual values
                     if true {
-                        true_case.draw(ui);
+                        true_case.iter().for_each(|f| f.draw(ui));
                     } else {
-                        false_case.draw(ui);
+                        false_case.iter().for_each(|f| f.draw(ui));
                     }
                 });
             },
+            _ => todo!()
         }
     }
 }
