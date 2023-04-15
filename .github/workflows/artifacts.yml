@@ -1,0 +1,43 @@
+
+name: Artifacts
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  pages:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    name: Artifacts Pages
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jetli/wasm-pack-action@v0.4.0
+        with: 
+          version: 'latest'
+      - name: Build WASM
+        run: wasm-pack build --target web
+      - name: Consolidate Webpages
+        run: mkdir output && mv index.html output && mv pkg output
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './output'
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
